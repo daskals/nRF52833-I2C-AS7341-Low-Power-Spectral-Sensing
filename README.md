@@ -72,7 +72,7 @@ docs/
 
 Captured with Nordic PPK2:
 
-![Current Consumption](images/as7441_power_profilee.png)
+![Current Consumption](images/as7441_power_profilee.PNG)
 
 ## 📚 References
 
