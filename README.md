@@ -25,6 +25,21 @@ Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the 
 4. Acquire spectral data  
 5. Shutdown or disconnect I2C pins (high-Z)  
 
+
+## 🛠️ Software Setup
+
+* **SDK:** Nordic nRF5 SDK 17.1.0
+* **Toolchain:** SEGGER Embedded Studio for ARM (v5.42a tested)
+* **SoftDevice:** Not required
+
+> 📁 To use this project:
+>
+> 1. Copy the project folder into:
+>    `nRF5_SDK_17.1.0_ddde560/examples/peripheral/`
+> 2. Open the `.emProject` file in
+>    `pca10100/blank/ses/`
+> 3. Build and flash using SEGGER Embedded Studio
+
 ## 📂 Directory Structure
 
 ```
@@ -51,13 +66,13 @@ docs/
 
 ### PAR and Lux Output (Example)
 
-![PAR and Lux Results](images/as7341_par_lux_results.png)
+![PAR and Lux Results](images/as7441_debug_out.png)
 
 ### Power Consumption Profile
 
 Captured with Nordic PPK2:
 
-![Current Consumption](images/as7341_current_profile.png)
+![Current Consumption](images/as7441_power_profilee.png)
 
 ## 📚 References
 
