@@ -47,6 +47,18 @@ docs/
 | ...     | ...   |
 | NIR     | 135   |
 
+## 🌞 Spectral & Power Profiling
+
+### PAR and Lux Output (Example)
+
+![PAR and Lux Results](images/as7341_par_lux_results.png)
+
+### Power Consumption Profile
+
+Captured with Nordic PPK2:
+
+![Current Consumption](images/as7341_current_profile.png)
+
 ## 📚 References
 
 - [AS7341 Datasheet – AMS](https://ams.com/as7341)
