@@ -66,7 +66,7 @@ docs/
 
 ### PAR and Lux Output (Example)
 
-![PAR and Lux Results](images/as7441_debug_out.png)
+![PAR and Lux Results](images/as7441_debug_out.PNG)
 
 ### Power Consumption Profile
 
