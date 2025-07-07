@@ -66,13 +66,13 @@ docs/
 
 ### PAR and Lux Output (Example)
 
-![PAR and Lux Results](images/as7441_debug_out.png)
+![PAR and Lux Results](images/as7441_debug_out.PNG)
 
 ### Power Consumption Profile
 
 Captured with Nordic PPK2:
 
-![Current Consumption](images/as7441_power_profilee.png)
+![Current Consumption](images/as7441_power_profile.PNG)
 
 ## 📚 References
 
