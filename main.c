@@ -288,17 +288,17 @@ void saadc_init(void)
     nrf_drv_saadc_config_t saadc_config;
     nrf_saadc_channel_config_t channel_config;
 
-	
+    
     //Configure SAADC
     saadc_config.low_power_mode = true;                                                   //Enable low power mode.
     saadc_config.resolution = NRF_SAADC_RESOLUTION_12BIT;                                 //Set SAADC resolution to 12-bit. This will make the SAADC output values from 0 (when input voltage is 0V) to 2^12=4096 (when input voltage is 3.6V for channel gain setting of 1/6).
     saadc_config.oversample = SAADC_OVERSAMPLE;                                           //Set oversample to 4x. This will make the SAADC output a single averaged value when the SAMPLE task is triggered 4 times.
     saadc_config.interrupt_priority = APP_IRQ_PRIORITY_LOW;                               //Set SAADC interrupt to low priority.
-	
+    
     //Initialize SAADC
     err_code = nrf_drv_saadc_init(&saadc_config, saadc_callback);                         //Initialize the SAADC with configuration and callback function. The application must then implement the saadc_callback function, which will be called when SAADC interrupt is triggered
     APP_ERROR_CHECK(err_code);
-		
+        
     //Configure SAADC channel
     channel_config.reference = NRF_SAADC_REFERENCE_INTERNAL;                              //Set internal reference of fixed 0.6 volts
     channel_config.gain = NRF_SAADC_GAIN1_6;                                              //Set input gain to 1/6. The maximum SAADC input voltage is then 0.6V/(1/6)=3.6V. The single ended input range is then 0V-3.6V
@@ -313,7 +313,7 @@ void saadc_init(void)
     channel_config.resistor_p = NRF_SAADC_RESISTOR_DISABLED;                              //Disable pullup resistor on the input pin
     channel_config.resistor_n = NRF_SAADC_RESISTOR_DISABLED;                              //Disable pulldown resistor on the input pin
 
-	
+    
     //Initialize SAADC channel
     err_code = nrf_drv_saadc_channel_init(0, &channel_config);                            //Initialize SAADC channel 0 with the channel configuration
     APP_ERROR_CHECK(err_code);
@@ -357,27 +357,45 @@ int main(void)
     NRF_POWER->DCDCEN = 1;                           //Enabling the DCDC converter for lower current consumption
     NRF_LOG_INFO("Main Inits.");	
     // Initialize the logging module
-    init_log();
-    gpio_init();
-    lfclk_config();                                  //Configure low frequency 32kHz clock
+    ret_code_t err_code;
 
-    i2c_init();
+    err_code = NRF_SUCCESS;
+    init_log();
+    NRF_LOG_INFO("init_log() returned: %d", err_code);
+
+    gpio_init();
+    NRF_LOG_INFO("gpio_init() done");
+
+    lfclk_config();
+    NRF_LOG_INFO("lfclk_config() done");
+
+    err_code = i2c_init();
+    NRF_LOG_INFO("i2c_init() returned: %d", err_code);
 
     // Enable sensor board power via GPIO 1.08
     nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,8));
     nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,8)); // Set high to enable sensor board
+    NRF_LOG_INFO("Sensor board power enabled");
 
-    as7341_ok=test_as7341_connection();
+    as7341_ok = test_as7341_connection();
+    NRF_LOG_INFO("test_as7341_connection() returned: %d", as7341_ok);
     if (as7341_ok)
     {
-      NRF_LOG_INFO("as7341 OK.");
-      as7341_init_sensor();
-      as7341_initialized = true;
+        err_code = as7341_init_sensor();
+        NRF_LOG_INFO("as7341_init_sensor() returned: %d", err_code);
+        as7341_initialized = true;
+    }
+    else
+    {
+        NRF_LOG_WARNING("AS7341 sensor not detected. Continuing without sensor.");
+        as7341_initialized = false;
     }
 
-    saadc_init();  //Initialize and start SAADC
-    // Only now start RTC, after all inits are done!
-    rtc_config();  // Configure RTC and enable it
+    saadc_init();
+    NRF_LOG_INFO("saadc_init() done");
+
+    rtc_config();
+    NRF_LOG_INFO("rtc_config() done");
     
     while (1)
     { 

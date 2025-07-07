@@ -16,8 +16,13 @@
 #include <errno.h>
 #include "as7341_defines.h"
 
-#define PIN_I2C_SDA   17 
-#define PIN_I2C_SCL   19 
+//#define PIN_I2C_SDA   26 
+//#define PIN_I2C_SCL   27 
+
+#define PIN_I2C_SDA   19 
+#define PIN_I2C_SCL   17 
+
+
 
 
 // Transfer completion flag
@@ -92,7 +97,7 @@ void i2c_disable_internal_pullups(void)
  * Configures the TWI peripheral with the specified pins and frequency,
  * registers the event handler, and enables the TWI driver.
  */
-void i2c_init(void)
+ret_code_t i2c_init(void)
 {
     ret_code_t err_code;
     NRF_LOG_INFO("I2C INIT");
@@ -107,11 +112,19 @@ void i2c_init(void)
 
     //i2c_enable_internal_pullups();
     err_code = nrf_drv_twi_init(&m_twi, &twi_sensor_config, NULL, NULL);
-    HANDLE_ERROR(err_code);
+    if (err_code == NRF_ERROR_INVALID_STATE) {
+        NRF_LOG_WARNING("I2C already initialized.");
+        // Already initialized, treat as success
+        err_code = NRF_SUCCESS;
+    } else if (err_code != NRF_SUCCESS) {
+        NRF_LOG_ERROR("I2C init failed: %d", err_code);
+        return err_code;
+    }
 
     nrf_drv_twi_enable(&m_twi);
     NRF_LOG_INFO("I2C INIT COMPLETE");
     NRF_LOG_FLUSH();
+    return err_code;
 }
 
 

@@ -50,8 +50,9 @@ void i2c_disable_internal_pullups(void);
  * @brief Initialize the TWI (I2C) interface.
  *
  * Configures and enables the TWI peripheral for communication.
+ * @return NRF_SUCCESS on success, error code otherwise.
  */
-void i2c_init(void);
+ret_code_t i2c_init(void);
 
 /**
  * @brief Transmit a 32-bit unsigned integer over I2C and optionally receive a response.
