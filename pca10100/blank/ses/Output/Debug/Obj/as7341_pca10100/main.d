@@ -2,9 +2,6 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\main.c \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
- C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52833.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -17,12 +14,13 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../modules/nrfx/mdk/nrf52_to_nrf52833.h \
  ../../../../../../modules/nrfx/mdk/nrf51_to_nrf52.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
- ../../../../../../integration/nrfx/legacy/nrf_drv_saadc.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_saadc.h \
+ ../../../../../../components/boards/boards.h \
+ ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stddef.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/__crossworks.h \
  ../../../../../../modules/nrfx/mdk/nrf_peripherals.h \
  ../../../../../../modules/nrfx/mdk/nrf52833_peripherals.h \
  ../../../../../../integration/nrfx/nrfx_glue.h \
@@ -37,6 +35,7 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../components/libraries/util/app_util_platform.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
  ../../../../../../components/libraries/util/app_error.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/drivers_nrf/nrf_soc_nosd/nrf_error.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
@@ -45,9 +44,6 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- ../../../../../../modules/nrfx/hal/nrf_saadc.h \
- ../../../../../../components/boards/boards.h \
- ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../components/boards/pca10100.h \
  ../../../../../../components/libraries/util/app_error.h \
  ../../../../../../components/libraries/pwr_mgmt/nrf_pwr_mgmt.h \
@@ -66,6 +62,7 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../components/libraries/delay/nrf_delay.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \
+ C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/string.h \
  ../../../../../../components/libraries/util/sdk_os.h \
  ../../../../../../components/libraries/util/app_util.h \
  ../../../../../../components/libraries/util/sdk_macros.h \

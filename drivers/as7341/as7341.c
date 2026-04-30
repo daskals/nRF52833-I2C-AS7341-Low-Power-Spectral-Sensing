@@ -337,6 +337,7 @@ void as7341_sample_and_print(void)
         NRF_LOG_WARNING("AS7341: saturation detected — readings may be clipped");
     }
 
+    NRF_LOG_INFO("-----------------------------");
     NRF_LOG_INFO("AS7341 F1  415nm: %u", ch[AS7341_CHANNEL_415nm_F1]);
     NRF_LOG_INFO("AS7341 F2  445nm: %u", ch[AS7341_CHANNEL_445nm_F2]);
     NRF_LOG_INFO("AS7341 F3  480nm: %u", ch[AS7341_CHANNEL_480nm_F3]);

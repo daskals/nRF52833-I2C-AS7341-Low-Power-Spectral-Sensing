@@ -1,6 +1,6 @@
 # nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing
 
-Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the AS7341 multi-channel spectral sensor over I2C. Designed for outdoor applications such as PAR (Photosynthetically Active Radiation) monitoring, Lux measurement, and spectral analysis. Also includes battery voltage monitoring via the on-chip SAADC.
+Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the AS7341 multi-channel spectral sensor over I2C. Designed for outdoor applications such as PAR (Photosynthetically Active Radiation) monitoring, Lux measurement, and spectral analysis.
 
 ## Hardware
 
@@ -18,26 +18,6 @@ Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the 
 
 > **External pull-up resistors are required on both SDA and SCL lines.**
 > The firmware explicitly disables the nRF52833 internal pull-ups after TWI init so they do not conflict with the external resistors. Typical values: 4.7 kΩ to 3.3 V for 400 kHz operation.
-
-### Sensor Power Rail
-
-The AS7341 power supply is switched via a GPIO:
-
-| Signal            | nRF52833 Pin |
-|-------------------|-------------|
-| Sensor power enable (active high) | **P1.08** |
-
-A 10 ms startup delay is applied after enabling the rail before the first I2C access, to allow the AS7341 to complete its power-on reset.
-
-### ADC (Battery Voltage Monitoring)
-
-| Signal | nRF52833 Pin | ADC Channel |
-|--------|-------------|-------------|
-| Battery voltage (via divider) | **P0.02** | AIN0 |
-
-- 12-bit resolution, internal 0.6 V reference, gain 1/6 → input range 0–3.6 V
-- Voltage divider ratio of 6× applied in firmware
-- Offset calibration runs at startup
 
 ## Sensor Configuration
 
@@ -69,18 +49,14 @@ Both passes are triggered automatically by `as7341_read_all_channels()`, which r
 
 | Output | Description |
 |--------|-------------|
-| PAR    | Photosynthetically Active Radiation (µmol/m²/s), calculated from regression coefficients across spectral bands |
+| PAR    | Photosynthetically Active Radiation (µmol/m²/s), regression coefficients across spectral bands |
 | Lux    | Illuminance using CIE photopic luminosity weights |
-
-An IIR low-pass filter is applied to smooth PAR and Lux readings between samples.
 
 ## Low Power Strategy
 
 1. DCDC converter enabled (`NRF_POWER->DCDCEN = 1`)
-2. RTC2 used for 1-second periodic wake-ups (32 Hz LFCLK, low power vs TIMER)
+2. RTC2 used for 1-second periodic wake-ups (32 Hz LFCLK, lower power than TIMER)
 3. `nrf_pwr_mgmt_run()` in main loop → WFE between events
-4. Sensor power rail switched off between measurements via P1.08
-5. SAADC initialized in low-power mode (single sample, no EasyDMA buffer)
 
 ## Software Setup
 
@@ -109,30 +85,39 @@ An IIR low-pass filter is applied to smooth PAR and Lux readings between samples
 ### Expected Startup Log
 
 ```
+Main Inits.
+lfclk_config() done
 I2C INIT
 I2C INIT COMPLETE
-Sensor board power enabled
-AS7341 connection OK
+AS7341 successfully detected
 AS7341 initialized
-SAADC calibration starting...
-SAADC calibration complete
 rtc_config() done
 ```
 
 Then every 1 second:
 ```
-F1(415nm):  NNN   F2(445nm):  NNN   F3(480nm):  NNN   F4(515nm):  NNN
-F5(555nm):  NNN   F6(590nm):  NNN   F7(630nm):  NNN   F8(680nm):  NNN
-Clear:      NNN   NIR:        NNN
-PAR: NNN umol/m2/s   Lux: NNN
-Sample: NNN (NNN mV)
+-----------------------------
+AS7341 F1  415nm: NNN
+AS7341 F2  445nm: NNN
+AS7341 F3  480nm: NNN
+AS7341 F4  515nm: NNN
+AS7341 F5  555nm: NNN
+AS7341 F6  590nm: NNN
+AS7341 F7  630nm: NNN
+AS7341 F8  680nm: NNN
+AS7341 Clear_L  : NNN
+AS7341 NIR_L    : NNN
+AS7341 Clear_H  : NNN
+AS7341 NIR_H    : NNN
+AS7341 PAR      : NNN
+AS7341 Lux      : NNN
 ```
 
 ## Directory Structure
 
 ```
 nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing/
-├── main.c                            # App entry point: RTC, SAADC, sensor init, main loop
+├── main.c                            # App entry point: RTC, sensor init, main loop
 ├── drivers/
 │   ├── as7341/
 │   │   ├── as7341.c                  # Sensor driver implementation
@@ -163,12 +148,11 @@ Captured with Nordic PPK2:
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|
-| `ANACK` error on I2C | Sensor not powered or not ready | Check P1.08 is driving the power rail; verify 10 ms delay after power-on |
-| `ANACK` on every transaction | Missing pull-up resistors | Add external 4.7 kΩ pull-ups on SDA/SCL |
-| No RTT output | Debug session not started | Use Build → Debug (not just flash/run) |
+| `ANACK` error on I2C | Sensor not powered or not ready | Check sensor VDD; verify 3.3 V is present before the MCU starts I2C |
+| `ANACK` on every transaction | Missing pull-up resistors | Add external 4.7 kΩ pull-ups on SDA/SCL to 3.3 V |
+| No RTT output | Debug session not started | Use Build → Debug, not just flash/run |
 | All channel readings are 0 | Integration time too short or gain too low | Increase ATIME or GAIN in `as7341_init_sensor()` |
-| Saturated readings (65535) | Gain too high | Reduce gain in `as7341_init_sensor()` — the driver logs a warning when saturation is detected |
-| RTC timeout error | CC register set while counter is at same value | Already fixed: counter is cleared before CC is set |
+| Saturated readings (65535) | Gain too high | Reduce gain in `as7341_init_sensor()` — driver logs a warning when saturation is detected |
 
 ## References
 
