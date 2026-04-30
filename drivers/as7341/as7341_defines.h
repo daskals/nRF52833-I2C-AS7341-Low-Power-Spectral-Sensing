@@ -27,7 +27,7 @@
 
 /* ---------------------------------------------------------------------------
  * Bank 1 registers (require REG_BANK=1 in CFG0 register 0xA9)
- * DS §10: "reserved/unlisted bits must not be changed at any time"
+ * DS sec.10: "reserved/unlisted bits must not be changed at any time"
  * ---------------------------------------------------------------------------*/
 
 #define AS7341_ASTATUS          0x60  ///< ALS status (bank 1)
@@ -55,7 +55,7 @@
 #define AS7341_SP_HIGH_TH_H     0x87  ///< Spectral high threshold high byte
 #define AS7341_AUXID            0x90  ///< Auxiliary ID
 #define AS7341_REVID            0x91  ///< Revision ID
-#define AS7341_ID               0x92  ///< Chip ID register — bits [7:2] = chip ID
+#define AS7341_ID               0x92  ///< Chip ID register - bits [7:2] = chip ID
 #define AS7341_STATUS           0x93  ///< Interrupt status (ASAT, AINT, FINT, CINT, SINT)
 #define AS7341_ASTATUS_         0x94  ///< ALS status (bank 0 mirror)
 #define AS7341_CH0_DATA_L       0x95  ///< ADC channel 0 data low byte
@@ -100,17 +100,17 @@
 #define AS7341_FDATA_H          0xFF  ///< FIFO data high byte
 
 /* ---------------------------------------------------------------------------
- * ENABLE register (0x80) bit masks — DS Figure 33
+ * ENABLE register (0x80) bit masks - DS Figure 33
  * ---------------------------------------------------------------------------*/
 
-#define AS7341_ENABLE_PON       0x01  ///< Power ON — activates internal oscillator
+#define AS7341_ENABLE_PON       0x01  ///< Power ON - activates internal oscillator
 #define AS7341_ENABLE_SP_EN     0x02  ///< Spectral measurement enable
 #define AS7341_ENABLE_WEN       0x08  ///< Wait enable between measurements
 #define AS7341_ENABLE_SMUXEN    0x10  ///< SMUX enable (self-clearing when done)
 #define AS7341_ENABLE_FDEN      0x40  ///< Flicker detection enable
 
 /* ---------------------------------------------------------------------------
- * STATUS2 register (0xA3) bit masks — DS Figure 32
+ * STATUS2 register (0xA3) bit masks - DS Figure 32
  * ---------------------------------------------------------------------------*/
 
 #define AS7341_STATUS2_AVALID   0x40  ///< Spectral measurement valid (bit 6)
@@ -118,7 +118,7 @@
 #define AS7341_STATUS2_ASAT_ANA 0x08  ///< Analog saturation  (bit 3)
 
 /* ---------------------------------------------------------------------------
- * CFG6 register (0xAF) SMUX_CMD field — DS Figure 32
+ * CFG6 register (0xAF) SMUX_CMD field - DS Figure 32
  * ---------------------------------------------------------------------------*/
 
 #define AS7341_CFG6_SMUX_CMD_MASK   0x18  ///< SMUX_CMD field mask (bits [4:3])
@@ -136,7 +136,7 @@
  * ---------------------------------------------------------------------------*/
 
 /**
- * @brief Gain multipliers — values match CFG1 AGAIN[4:0] register encoding (DS Fig 49).
+ * @brief Gain multipliers - values match CFG1 AGAIN[4:0] register encoding (DS Fig 49).
  */
 typedef enum {
     AS7341_GAIN_0_5X  = 0,
@@ -153,7 +153,7 @@ typedef enum {
 } as7341_gain_t;
 
 /**
- * @brief SMUX configuration commands — CFG6 SMUX_CMD[4:3] field (DS Fig 32).
+ * @brief SMUX configuration commands - CFG6 SMUX_CMD[4:3] field (DS Fig 32).
  */
 typedef enum {
     AS7341_SMUX_CMD_ROM_RESET = 0, ///< ROM code initialisation of SMUX
@@ -162,7 +162,7 @@ typedef enum {
 } as7341_smux_cmd_t;
 
 /**
- * @brief Internal ADC channel indices (CH0–CH5).
+ * @brief Internal ADC channel indices (CH0-CH5).
  */
 typedef enum {
     AS7341_ADC_CHANNEL_0 = 0,
@@ -196,7 +196,7 @@ typedef enum {
 } as7341_color_channel_t;
 
 /**
- * @brief Interrupt persistence — measurement cycles outside threshold before interrupt.
+ * @brief Interrupt persistence - measurement cycles outside threshold before interrupt.
  */
 typedef enum {
     AS7341_INT_COUNT_ALL = 0,

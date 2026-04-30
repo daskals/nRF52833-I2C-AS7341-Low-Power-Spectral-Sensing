@@ -7,7 +7,7 @@
 
 static as7341_gain_t s_as7341_gain = AS7341_GAIN_1X;
 
-/* Gain multiplier lookup — index matches as7341_gain_t enum (DS Fig 49) */
+/* Gain multiplier lookup - index matches as7341_gain_t enum (DS Fig 49) */
 static const float gain_factors[] = {
     0.5f,   // AS7341_GAIN_0_5X
     1.0f,   // AS7341_GAIN_1X
@@ -83,12 +83,12 @@ bool as7341_init_sensor(void)
 {
     NRF_LOG_INFO("AS7341 Init");
 
-    /* DS §10.2.1: set PON='1' first, then configure registers */
+    /* DS sec.10.2.1: set PON='1' first, then configure registers */
     as7341_power_enable(true);
     nrf_delay_ms(5); /* allow oscillator to stabilise in IDLE state */
 
     s_as7341_gain = AS7341_GAIN_1X;
-    /* Integration time = (35+1)*(999+1)*2.78 µs ≈ 100 ms */
+    /* Integration time = (35+1)*(999+1)*2.78 us ~ 100 ms */
     return as7341_configure(AS7341_GAIN_1X, 35, 999);
 }
 
@@ -96,10 +96,10 @@ bool as7341_configure(as7341_gain_t gain, uint8_t atime, uint16_t astep)
 {
     bool ok = true;
 
-    /* Track gain for PAR/lux normalisation — must be updated before any cal */
+    /* Track gain for PAR/lux normalisation - must be updated before any cal */
     s_as7341_gain = gain;
 
-    /* Integration time: (ATIME+1) × (ASTEP+1) × 2.78 µs (DS §10.2.2) */
+    /* Integration time: (ATIME+1) x (ASTEP+1) x 2.78 us (DS sec.10.2.2) */
     ok &= as7341_write_reg(AS7341_ATIME, atime);
     ok &= as7341_write_reg(AS7341_ASTEP_L, (uint8_t)(astep & 0xFFu));
     ok &= as7341_write_reg(AS7341_ASTEP_H, (uint8_t)(astep >> 8));
@@ -107,12 +107,12 @@ bool as7341_configure(as7341_gain_t gain, uint8_t atime, uint16_t astep)
     /* CFG0: normal power mode, bank 0, no trigger lengthening */
     ok &= as7341_write_reg(AS7341_CFG0, 0x00u);
 
-    /* CFG1: gain — lower 5 bits (DS Fig 49) */
+    /* CFG1: gain - lower 5 bits (DS Fig 49) */
     ok &= as7341_write_reg(AS7341_CFG1, (uint8_t)gain);
 
     /* NOTE: CFG6 (SMUX_CMD) is written by as7341_set_smux_command() immediately
-     * before each measurement pass. Do NOT write it here — a stray value
-     * would corrupt the reserved bits [7:5] (DS §10, "gray fields must not
+     * before each measurement pass. Do NOT write it here - a stray value
+     * would corrupt the reserved bits [7:5] (DS sec.10, "gray fields must not
      * be changed at any time"). */
 
     return ok;
@@ -167,27 +167,27 @@ void as7341_set_smux_low_channels(bool f1_f4)
 void as7341_setup_f1f4_clear_nir(void)
 {
     /* Route F1-F4, Clear, NIR to ADC0-ADC5
-     * Register format: upper nibble = right PD → ADC, lower nibble = left PD → ADC */
-    as7341_write_reg(0x00, 0x30); // F3  left  → ADC2
-    as7341_write_reg(0x01, 0x01); // F1  left  → ADC0
+     * Register format: upper nibble = right PD -> ADC, lower nibble = left PD -> ADC */
+    as7341_write_reg(0x00, 0x30); // F3  left  -> ADC2
+    as7341_write_reg(0x01, 0x01); // F1  left  -> ADC0
     as7341_write_reg(0x02, 0x00);
     as7341_write_reg(0x03, 0x00);
     as7341_write_reg(0x04, 0x00);
-    as7341_write_reg(0x05, 0x42); // F4  left  → ADC3, F2 left → ADC1
+    as7341_write_reg(0x05, 0x42); // F4  left  -> ADC3, F2 left -> ADC1
     as7341_write_reg(0x06, 0x00);
     as7341_write_reg(0x07, 0x00);
-    as7341_write_reg(0x08, 0x50); // Clear     → ADC4
+    as7341_write_reg(0x08, 0x50); // Clear     -> ADC4
     as7341_write_reg(0x09, 0x00);
     as7341_write_reg(0x0A, 0x00);
     as7341_write_reg(0x0B, 0x00);
-    as7341_write_reg(0x0C, 0x20); // F2  right → ADC1
-    as7341_write_reg(0x0D, 0x04); // F4  right → ADC3
+    as7341_write_reg(0x0C, 0x20); // F2  right -> ADC1
+    as7341_write_reg(0x0D, 0x04); // F4  right -> ADC3
     as7341_write_reg(0x0E, 0x00);
-    as7341_write_reg(0x0F, 0x30); // F3  right → ADC2
-    as7341_write_reg(0x10, 0x01); // F1  right → ADC0
-    as7341_write_reg(0x11, 0x50); // Clear     → ADC4
+    as7341_write_reg(0x0F, 0x30); // F3  right -> ADC2
+    as7341_write_reg(0x10, 0x01); // F1  right -> ADC0
+    as7341_write_reg(0x11, 0x50); // Clear     -> ADC4
     as7341_write_reg(0x12, 0x00);
-    as7341_write_reg(0x13, 0x06); // NIR       → ADC5
+    as7341_write_reg(0x13, 0x06); // NIR       -> ADC5
 }
 
 void as7341_setup_f5f8_clear_nir(void)
@@ -196,23 +196,23 @@ void as7341_setup_f5f8_clear_nir(void)
     as7341_write_reg(0x00, 0x00);
     as7341_write_reg(0x01, 0x00);
     as7341_write_reg(0x02, 0x00);
-    as7341_write_reg(0x03, 0x40); // F8  left  → ADC3
-    as7341_write_reg(0x04, 0x02); // F6  left  → ADC1
+    as7341_write_reg(0x03, 0x40); // F8  left  -> ADC3
+    as7341_write_reg(0x04, 0x02); // F6  left  -> ADC1
     as7341_write_reg(0x05, 0x00);
-    as7341_write_reg(0x06, 0x10); // F5  left  → ADC0
-    as7341_write_reg(0x07, 0x03); // F7  left  → ADC2
-    as7341_write_reg(0x08, 0x50); // Clear     → ADC4
-    as7341_write_reg(0x09, 0x10); // F5  right → ADC0
-    as7341_write_reg(0x0A, 0x03); // F7  right → ADC2
+    as7341_write_reg(0x06, 0x10); // F5  left  -> ADC0
+    as7341_write_reg(0x07, 0x03); // F7  left  -> ADC2
+    as7341_write_reg(0x08, 0x50); // Clear     -> ADC4
+    as7341_write_reg(0x09, 0x10); // F5  right -> ADC0
+    as7341_write_reg(0x0A, 0x03); // F7  right -> ADC2
     as7341_write_reg(0x0B, 0x00);
     as7341_write_reg(0x0C, 0x00);
     as7341_write_reg(0x0D, 0x00);
-    as7341_write_reg(0x0E, 0x24); // F8  right → ADC3, F6 right → ADC1
+    as7341_write_reg(0x0E, 0x24); // F8  right -> ADC3, F6 right -> ADC1
     as7341_write_reg(0x0F, 0x00);
     as7341_write_reg(0x10, 0x00);
-    as7341_write_reg(0x11, 0x50); // Clear     → ADC4
+    as7341_write_reg(0x11, 0x50); // Clear     -> ADC4
     as7341_write_reg(0x12, 0x00);
-    as7341_write_reg(0x13, 0x06); // NIR       → ADC5
+    as7341_write_reg(0x13, 0x06); // NIR       -> ADC5
 }
 
 /* ---------------------------------------------------------------------------
@@ -329,12 +329,12 @@ void as7341_sample_and_print(void)
         return;
     }
 
-    /* Warn if saturation occurred — readings may be clipped (DS §10, STATUS2) */
+    /* Warn if saturation occurred - readings may be clipped (DS sec.10, STATUS2) */
     uint8_t status2 = 0;
     as7341_read_reg(AS7341_STATUS2, &status2);
     if (status2 & (AS7341_STATUS2_ASAT_DIG | AS7341_STATUS2_ASAT_ANA))
     {
-        NRF_LOG_WARNING("AS7341: saturation detected — readings may be clipped");
+        NRF_LOG_WARNING("AS7341: saturation detected - readings may be clipped");
     }
 
     NRF_LOG_INFO("-----------------------------");
@@ -370,7 +370,7 @@ as7341_gain_t as7341_get_current_gain(void)
 int32_t iir_filter(int32_t previous, int32_t current, uint16_t alpha)
 {
     if (alpha > 255u) alpha = 255u;
-    /* alpha=255 → heavily weighted to previous; alpha=0 → pass current through */
+    /* alpha=255 -> heavily weighted to previous; alpha=0 -> pass current through */
     return (int32_t)(((uint32_t)alpha * (uint32_t)previous +
                       (uint32_t)(255u - alpha) * (uint32_t)current) / 255u);
 }
@@ -427,11 +427,11 @@ int32_t as7341_calculate_par(const uint16_t *channel_readings)
  * ---------------------------------------------------------------------------*/
 
 static const float lux_coeffs[8] = {
-    0.001f,  // F1 415 nm — negligible photopic response
+    0.001f,  // F1 415 nm - negligible photopic response
     0.015f,  // F2 445 nm
     0.076f,  // F3 480 nm
     0.243f,  // F4 515 nm
-    0.503f,  // F5 555 nm — near photopic peak
+    0.503f,  // F5 555 nm - near photopic peak
     0.450f,  // F6 590 nm
     0.265f,  // F7 630 nm
     0.066f,  // F8 680 nm

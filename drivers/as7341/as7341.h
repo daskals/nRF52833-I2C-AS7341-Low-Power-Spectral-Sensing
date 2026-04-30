@@ -117,7 +117,7 @@ void as7341_sample_and_print(void);
 
 /**
  * @brief Calculate Photosynthetically Active Radiation (PAR) value.
- * @return Calculated PAR value in micromoles per square meter per second (µmol/m²/s).
+ * @return Calculated PAR value in micromoles per square meter per second (umol/m^2/s).
  */
 int32_t as7341_calculate_par(const uint16_t *channel_readings); // deprecated, use _from_channels
 
@@ -130,7 +130,7 @@ int32_t as7341_calculate_lux(const uint16_t *channel_readings); // deprecated, u
 /**
  * @brief Calculate Photosynthetically Active Radiation (PAR) value from channels.
  * @param channel_readings Pointer to an array of channel readings.
- * @return Calculated PAR value in micromoles per square meter per second (µmol/m²/s).
+ * @return Calculated PAR value in micromoles per square meter per second (umol/m^2/s).
  */
 int32_t as7341_calculate_par_from_channels(const uint16_t *channel_readings);
 
