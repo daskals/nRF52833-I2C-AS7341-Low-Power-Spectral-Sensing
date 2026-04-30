@@ -122,6 +122,8 @@ ret_code_t i2c_init(void)
     }
 
     nrf_drv_twi_enable(&m_twi);
+    i2c_disable_internal_pullups(); // External pull-ups fitted; override driver's forced pull-ups
+
     NRF_LOG_INFO("I2C INIT COMPLETE");
     NRF_LOG_FLUSH();
     return err_code;

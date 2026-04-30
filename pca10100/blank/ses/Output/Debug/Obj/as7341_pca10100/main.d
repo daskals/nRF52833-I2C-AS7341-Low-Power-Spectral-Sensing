@@ -1,5 +1,5 @@
 Output/Debug/Obj/as7341_pca10100/main.o: \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\main.c \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\main.c \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdio.h \

@@ -233,9 +233,9 @@ static void rtc_handler(nrf_drv_rtc_int_type_t int_type)
         LEDS_INVERT(BSP_LED_1_MASK); // Toggle LED1 to indicate SAADC sampling start
         #endif
 
+        nrf_drv_rtc_counter_clear(&rtc);
         err_code = nrf_drv_rtc_cc_set(&rtc, 0, rtc_ticks, true);
         APP_ERROR_CHECK(err_code);
-        nrf_drv_rtc_counter_clear(&rtc);
     }
 }
 
@@ -376,6 +376,7 @@ int main(void)
     nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(1,8));
     nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(1,8)); // Set high to enable sensor board
     NRF_LOG_INFO("Sensor board power enabled");
+    nrf_delay_ms(10); // Wait for AS7341 to finish booting before first I2C access
 
     as7341_ok = test_as7341_connection();
     NRF_LOG_INFO("test_as7341_connection() returned: %d", as7341_ok);

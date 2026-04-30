@@ -1,6 +1,6 @@
 Output/Debug/Obj/as7341_pca10100/i2c_interface.o: \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\drivers\i2c\i2c_interface.c \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\drivers\i2c\i2c_interface.h \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\drivers\i2c\i2c_interface.c \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\drivers\i2c\i2c_interface.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_twi.h \
  ../../../../../../modules/nrfx/nrfx.h \
