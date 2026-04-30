@@ -82,36 +82,6 @@ Both passes are triggered automatically by `as7341_read_all_channels()`, which r
 
 > RTT messages will not appear if you flash without the debugger attached. Always use **Build → Debug** to start a debug session and view the output.
 
-### Expected Startup Log
-
-```
-Main Inits.
-lfclk_config() done
-I2C INIT
-I2C INIT COMPLETE
-AS7341 successfully detected
-AS7341 initialized
-rtc_config() done
-```
-
-Then every 1 second:
-```
------------------------------
-AS7341 F1  415nm: NNN
-AS7341 F2  445nm: NNN
-AS7341 F3  480nm: NNN
-AS7341 F4  515nm: NNN
-AS7341 F5  555nm: NNN
-AS7341 F6  590nm: NNN
-AS7341 F7  630nm: NNN
-AS7341 F8  680nm: NNN
-AS7341 Clear_L  : NNN
-AS7341 NIR_L    : NNN
-AS7341 Clear_H  : NNN
-AS7341 NIR_H    : NNN
-AS7341 PAR      : NNN
-AS7341 Lux      : NNN
-```
 
 ## Directory Structure
 
