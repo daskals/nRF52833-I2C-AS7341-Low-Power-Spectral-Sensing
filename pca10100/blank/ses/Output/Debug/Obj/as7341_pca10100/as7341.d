@@ -1,9 +1,9 @@
 Output/Debug/Obj/as7341_pca10100/as7341.o: \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\drivers\as7341\as7341.c \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\drivers\as7341\as7341.c \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\drivers\as7341\as7341.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdint.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdbool.h \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\drivers\as7341\as7341_defines.h \
- C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\saadc_low_power_rtc_i2c_par\drivers\as7341\as7341.h \
+ C\:\nRF5_SDK_17.1.0_ddde560\examples\peripheral\nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing\drivers\as7341\as7341_defines.h \
  ../../../drivers/i2c/i2c_interface.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_twi.h \
  ../../../../../../modules/nrfx/nrfx.h \

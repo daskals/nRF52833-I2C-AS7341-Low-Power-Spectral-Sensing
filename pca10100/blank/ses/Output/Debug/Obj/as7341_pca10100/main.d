@@ -63,18 +63,6 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../integration/nrfx/legacy/nrf_drv_rtc.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_rtc.h \
  ../../../../../../modules/nrfx/hal/nrf_rtc.h \
- ../../../../../../integration/nrfx/legacy/nrf_drv_spi.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_spim.h \
- ../../../../../../modules/nrfx/hal/nrf_spim.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_spi.h \
- ../../../../../../modules/nrfx/hal/nrf_spi.h \
- ../../../drivers/i2c/i2c_interface.h \
- ../../../../../../integration/nrfx/legacy/nrf_drv_twi.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_twim.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_twi_twim.h \
- ../../../../../../modules/nrfx/hal/nrf_twim.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_twi.h \
- ../../../../../../modules/nrfx/hal/nrf_twi.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
  ../../../../../../components/libraries/log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \
@@ -93,4 +81,11 @@ Output/Debug/Obj/as7341_pca10100/main.o: \
  ../../../../../../components/libraries/memobj/nrf_memobj.h \
  C\:/Program\ Files/SEGGER/SEGGER\ Embedded\ Studio\ for\ ARM\ 5.42a/include/stdlib.h \
  ../../../../../../components/libraries/balloc/nrf_balloc.h \
- ../../../../../../components/libraries/log/nrf_log_default_backends.h
+ ../../../../../../components/libraries/log/nrf_log_default_backends.h \
+ ../../../drivers/i2c/i2c_interface.h \
+ ../../../../../../integration/nrfx/legacy/nrf_drv_twi.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_twim.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_twi_twim.h \
+ ../../../../../../modules/nrfx/hal/nrf_twim.h \
+ ../../../../../../modules/nrfx/drivers/include/nrfx_twi.h \
+ ../../../../../../modules/nrfx/hal/nrf_twi.h

@@ -151,9 +151,10 @@ int32_t as7341_calculate_lux_from_channels(const uint16_t *channel_readings);
 int32_t iir_filter(int32_t previous, int32_t current, uint16_t alpha);
 
 /**
- * @brief Initialize the AS7341 sensor (wrapper for as7341_init).
+ * @brief Initialize the AS7341 sensor: enables PON, waits for IDLE, configures timing/gain.
+ * @return true if all register writes succeeded, false otherwise.
  */
-void as7341_init_sensor(void);
+bool as7341_init_sensor(void);
 
 /**
  * @brief Get the current gain setting of the AS7341 sensor.

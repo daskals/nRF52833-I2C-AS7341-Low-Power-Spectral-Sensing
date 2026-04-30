@@ -1,70 +1,155 @@
 # nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing
 
-Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the AS7341 multi-channel spectral sensor over I2C. Designed for outdoor applications such as PAR (Photosynthetically Active Radiation) monitoring and spectral analysis.
+Low-power firmware for Nordic Semiconductor's nRF52833 DK to interface with the AS7341 multi-channel spectral sensor over I2C. Designed for outdoor applications such as PAR (Photosynthetically Active Radiation) monitoring, Lux measurement, and spectral analysis. Also includes battery voltage monitoring via the on-chip SAADC.
 
-## 🛠 Hardware
+## Hardware
 
-- **MCU**: nRF52833 DK  
-- **Sensor**: AS7341 (AMS)  
-- **Interface**: I2C (3.3V logic)  
-- **Use Case**: Outdoor spectral measurement / PAR sensing  
+- **MCU**: nRF52833 DK (PCA10100)
+- **Sensor**: AS7341 11-channel spectral sensor (AMS)
+- **Interface**: I2C / TWI at 400 kHz (3.3 V logic)
+- **Use Case**: Outdoor spectral measurement, PAR and Lux sensing
 
-## ⚙️ Sensor Configuration
+### I2C Pin Assignment
 
-- **Gain**: `AS7341_GAIN_1X`
-- **ATIME**: 35  
-- **ASTEP**: 999  
-- **Total Integration Time**: 100 ms  
-- **Channels**: F1–F8, Clear, NIR  
+| Signal | nRF52833 Pin |
+|--------|-------------|
+| SDA    | **P0.19**   |
+| SCL    | **P0.17**   |
 
-## 🔋 Low Power Strategy
+> **External pull-up resistors are required on both SDA and SCL lines.**
+> The firmware explicitly disables the nRF52833 internal pull-ups after TWI init so they do not conflict with the external resistors. Typical values: 4.7 kΩ to 3.3 V for 400 kHz operation.
 
-1. Initialize I2C bus  
-2. Wake up AS7341 sensor  
-3. Configure measurement registers  
-4. Acquire spectral data  
-5. Shutdown or disconnect I2C pins (high-Z)  
+### Sensor Power Rail
 
+The AS7341 power supply is switched via a GPIO:
 
-## 🛠️ Software Setup
+| Signal            | nRF52833 Pin |
+|-------------------|-------------|
+| Sensor power enable (active high) | **P1.08** |
 
-* **SDK:** Nordic nRF5 SDK 17.1.0
-* **Toolchain:** SEGGER Embedded Studio for ARM (v5.42a tested)
-* **SoftDevice:** Not required
+A 10 ms startup delay is applied after enabling the rail before the first I2C access, to allow the AS7341 to complete its power-on reset.
 
-> 📁 To use this project:
->
-> 1. Copy the project folder into:
->    `nRF5_SDK_17.1.0_ddde560/examples/peripheral/`
-> 2. Open the `.emProject` file in
->    `pca10100/blank/ses/`
-> 3. Build and flash using SEGGER Embedded Studio
+### ADC (Battery Voltage Monitoring)
 
-## 📂 Directory Structure
+| Signal | nRF52833 Pin | ADC Channel |
+|--------|-------------|-------------|
+| Battery voltage (via divider) | **P0.02** | AIN0 |
+
+- 12-bit resolution, internal 0.6 V reference, gain 1/6 → input range 0–3.6 V
+- Voltage divider ratio of 6× applied in firmware
+- Offset calibration runs at startup
+
+## Sensor Configuration
+
+| Parameter | Value |
+|-----------|-------|
+| Gain      | `AS7341_GAIN_1X` |
+| ATIME     | 35 |
+| ASTEP     | 999 |
+| Integration time | ~100 ms |
+| Channels  | F1 (415 nm) – F8 (680 nm), Clear, NIR |
+
+### Integration Time Formula
 
 ```
-firmware/
-├── as7341.c / as7341.h          # Sensor driver
-├── as7341_defines.h             # Register definitions
-├── i2c_interface.c / .h         # TWI abstraction using nRF SDK
-├── main.c                       # Measurement logic and logging
-├── sdk_config.h                 # SDK configuration
-docs/
-└── AS7341_datasheet.pdf         # Optional datasheet
+t_int = (ATIME + 1) × (ASTEP + 1) × 2.78 µs
+      = 36 × 1000 × 2.78 µs ≈ 100 ms
 ```
 
-## 📊 Example Output
+### Measurement Sequence
 
-| Channel | Value |
-|---------|-------|
-| F1      | 122   |
-| F2      | 147   |
-| ...     | ...   |
-| NIR     | 135   |
+The AS7341 has 6 ADC channels but 10 spectral channels. Two SMUX passes are used per sample:
 
-## 🌞 Spectral & Power Profiling
+1. **Pass 1** — routes F1–F4, Clear, NIR → ADC channels 0–5
+2. **Pass 2** — routes F5–F8, Clear, NIR → ADC channels 0–5
 
-### PAR and Lux Output (Example)
+Both passes are triggered automatically by `as7341_read_all_channels()`, which returns 12 values: `[F1, F2, F3, F4, Clear0, NIR0, F5, F6, F7, F8, Clear, NIR]`.
+
+### Computed Outputs
+
+| Output | Description |
+|--------|-------------|
+| PAR    | Photosynthetically Active Radiation (µmol/m²/s), calculated from regression coefficients across spectral bands |
+| Lux    | Illuminance using CIE photopic luminosity weights |
+
+An IIR low-pass filter is applied to smooth PAR and Lux readings between samples.
+
+## Low Power Strategy
+
+1. DCDC converter enabled (`NRF_POWER->DCDCEN = 1`)
+2. RTC2 used for 1-second periodic wake-ups (32 Hz LFCLK, low power vs TIMER)
+3. `nrf_pwr_mgmt_run()` in main loop → WFE between events
+4. Sensor power rail switched off between measurements via P1.08
+5. SAADC initialized in low-power mode (single sample, no EasyDMA buffer)
+
+## Software Setup
+
+| Item | Details |
+|------|---------|
+| SDK  | Nordic nRF5 SDK 17.1.0 |
+| Toolchain | SEGGER Embedded Studio for ARM (v5.42a or later) |
+| SoftDevice | Not required |
+| Logging | SEGGER RTT (J-Link on-board) |
+
+### Getting Started
+
+1. Copy the project folder into:
+   ```
+   nRF5_SDK_17.1.0_ddde560/examples/peripheral/
+   ```
+2. Open the `.emProject` file in:
+   ```
+   pca10100/blank/ses/
+   ```
+3. **Build and Debug** (F5 in SES) — do **not** just flash and run. RTT output is only visible when the debugger is attached.
+4. Open the **Debug Terminal** tab (or use SEGGER J-Link RTT Viewer) to see log output.
+
+> RTT messages will not appear if you flash without the debugger attached. Always use **Build → Debug** to start a debug session and view the output.
+
+### Expected Startup Log
+
+```
+I2C INIT
+I2C INIT COMPLETE
+Sensor board power enabled
+AS7341 connection OK
+AS7341 initialized
+SAADC calibration starting...
+SAADC calibration complete
+rtc_config() done
+```
+
+Then every 1 second:
+```
+F1(415nm):  NNN   F2(445nm):  NNN   F3(480nm):  NNN   F4(515nm):  NNN
+F5(555nm):  NNN   F6(590nm):  NNN   F7(630nm):  NNN   F8(680nm):  NNN
+Clear:      NNN   NIR:        NNN
+PAR: NNN umol/m2/s   Lux: NNN
+Sample: NNN (NNN mV)
+```
+
+## Directory Structure
+
+```
+nRF52833-I2C-AS7341-Low-Power-Spectral-Sensing/
+├── main.c                            # App entry point: RTC, SAADC, sensor init, main loop
+├── drivers/
+│   ├── as7341/
+│   │   ├── as7341.c                  # Sensor driver implementation
+│   │   ├── as7341.h                  # Driver API
+│   │   └── as7341_defines.h          # Register map, enums, bit masks
+│   └── i2c/
+│       ├── i2c_interface.c           # TWI abstraction (nRF SDK nrf_drv_twi)
+│       └── i2c_interface.h           # I2C API
+├── pca10100/blank/ses/
+│   └── as7341_pca10100.emProject     # SEGGER Embedded Studio project file
+├── sdk_config.h                      # nRF5 SDK peripheral configuration
+└── AS7341/                           # AS7341 datasheet (PDF)
+```
+
+## Example Output
+
+### RTT Log
 
 ![PAR and Lux Results](images/as7441_debug_out.PNG)
 
@@ -74,12 +159,24 @@ Captured with Nordic PPK2:
 
 ![Current Consumption](images/as7441_power_profile.PNG)
 
-## 📚 References
+## Troubleshooting
+
+| Symptom | Likely Cause | Fix |
+|---------|-------------|-----|
+| `ANACK` error on I2C | Sensor not powered or not ready | Check P1.08 is driving the power rail; verify 10 ms delay after power-on |
+| `ANACK` on every transaction | Missing pull-up resistors | Add external 4.7 kΩ pull-ups on SDA/SCL |
+| No RTT output | Debug session not started | Use Build → Debug (not just flash/run) |
+| All channel readings are 0 | Integration time too short or gain too low | Increase ATIME or GAIN in `as7341_init_sensor()` |
+| Saturated readings (65535) | Gain too high | Reduce gain in `as7341_init_sensor()` — the driver logs a warning when saturation is detected |
+| RTC timeout error | CC register set while counter is at same value | Already fixed: counter is cleared before CC is set |
+
+## References
 
 - [AS7341 Datasheet – AMS](https://ams.com/as7341)
 - [nRF52833 DK – Nordic Semiconductor](https://www.nordicsemi.com/Products/nRF52833)
+- [nRF5 SDK 17.1.0 Documentation](https://infocenter.nordicsemi.com/topic/sdk_nrf5_v17.1.0/index.html)
 - Based on: [`nRF52833-I2C-SPI-PCAP04-Low-Power-Capacitive-Sensing`](https://github.com/daskals/nRF52833-I2C-SPI-PCAP04-Low-Power-Capacitive-Sensing)
 
-## 📜 License
+## License
 
 MIT License

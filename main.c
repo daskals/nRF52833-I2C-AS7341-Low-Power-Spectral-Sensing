@@ -40,36 +40,10 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-/** 
- * Perhipheral: nRF52 SAADC
- * Compatibility: nRF52832 rev 1/nRF52840 Eng A, nRF5 SDK 13.0.0
- * Softdevice used: No softdevice
- *
-
- * This example enables the RTC timer to periodically trigger SAADC sampling. RTC is chosen here instead of 
- * TIMER because it is low power. The example samples on a single input pin, the AIN0, which maps to physical pin P0.02 on the nRF52832 IC.
- * This SAADC example shows the following features:
- * - Low Power -> Enabled with initializing SAADC when sampling and uninitializing when sampling is complete.
- *                Low power can only be obtained when UART_PRINTING_ENABLED is not defined and
- *                SAADC_SAMPLES_IN_BUFFER is 1
- * - Oversampling -> This reduces SAADC noise level, especially for higher SAADC resolutions, see
- *                   https://devzone.nordicsemi.com/question/83938/nrf52832-saadc-sampling/?comment=84340#comment-84340
- *                   Configured with the SAADC_OVERSAMPLE constant.
- * - BURST mode -> Burst mode can be combined with oversampling, which makes the SAADC sample all oversamples as fast
- *                 as it can with one SAMPLE task trigger. Set the SAADC_BURST_MODE constant to enable BURST mode.
- * - Offset Calibration -> SAADC needs to be occasionally calibrated. The desired calibration interval depends on the
- *                         expected temperature change rate, see the nRF52832 PS for more information. The
- *                         calibration interval can be adjusted with configuring the SAADC_CALIBRATION_INTERVAL
- *                         constant.
- * The SAADC sample result is printed on UART. To see the UART output, a UART terminal (e.g. Realterm) can be configured on 
- * your PC with the UART configuration set in the uart_config function, which is also described in the saadc example documentation -> 
- * http://infocenter.nordicsemi.com/topic/com.nordic.infocenter.sdk5.v11.0.0/nrf_dev_saadc_example.html?cp=5_0_0_4_5_24
- *
-
- * Indicators on the nRF52-DK board:
- * LED1: SAADC Sampling triggered 
- * LED2: SAADC sampling buffer full and event received
- * LED3: SAADC Offset calibration complete
+/**
+ * nRF52833 low-power spectral sensing with AS7341.
+ * Periodic RTC-triggered SAADC + AS7341 sampling, DCDC enabled.
+ * Platform: nRF52833, nRF5 SDK 17.1.0
  */
 
 // -----------------------------------------------------------------------------
@@ -89,9 +63,6 @@
 #include "nrf_drv_clock.h"
 #include "nrf_drv_rtc.h"
 
-#include "nrf_drv_spi.h"
-#include "i2c_interface.h"
-
 #include "nrf_delay.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
@@ -104,14 +75,11 @@
 // -----------------------------------------------------------------------------
 // Defines and Constants
 // -----------------------------------------------------------------------------
-#define LED_FUNCTIONALITY_ENABLED 1 // Set to 1 to enable LED functionality, 0 to disable
-#define CALIBRATION_FUNCTIONALITY_ENABLED 1 // Set to 1 to enable calibration functionality, 0 to disable
-#define SAADC_SAMPLE_INTERVAL_SEC 1 // Interval in seconds at which RTC times out and triggers SAADC sample task
-#define SAADC_SAMPLE_INTERVAL_MS (SAADC_SAMPLE_INTERVAL_SEC * 1000) // Convert seconds to milliseconds
-#define RTC_FREQUENCY 32                          //Determines the RTC frequency and prescaler
-#define RTC_CC_VALUE 8                            //Determines the RTC interrupt frequency and thereby the SAADC sampling frequency
-#define SAADC_CALIBRATION_INTERVAL 20              //Determines how often the SAADC should be calibrated relative to NRF_DRV_SAADC_EVT_DONE event. E.g. value 5 will make the SAADC calibrate every fifth time the NRF_DRV_SAADC_EVT_DONE is received.
-#define SAADC_SAMPLES_IN_BUFFER 1                 //Number of SAADC samples in RAM before returning a SAADC event. For low power SAADC set this constant to 1. Otherwise the EasyDMA will be enabled for an extended time which consumes high current.
+#define LED_FUNCTIONALITY_ENABLED 1
+#define SAADC_SAMPLE_INTERVAL_SEC 1
+#define SAADC_SAMPLE_INTERVAL_MS (SAADC_SAMPLE_INTERVAL_SEC * 1000)
+#define RTC_FREQUENCY 32
+#define SAADC_SAMPLES_IN_BUFFER 1
 #define SAADC_OVERSAMPLE NRF_SAADC_OVERSAMPLE_DISABLED  //Oversampling setting for the SAADC. Setting oversample to 4x This will make the SAADC output a single averaged value when the SAMPLE task is triggered 4 times. Enable BURST mode to make the SAADC sample 4 times when triggering SAMPLE task once.
 #define SAADC_BURST_MODE 0                        //Set to 1 to enable BURST mode, otherwise set to 0.
 #define SAADC_RESOLUTION_BITS   12                // ADC resolution in bits
@@ -123,14 +91,11 @@
 // -----------------------------------------------------------------------------
 // Global Variables
 // -----------------------------------------------------------------------------
-const  nrf_drv_rtc_t           rtc = NRF_DRV_RTC_INSTANCE(2); /**< Declaring an instance of nrf_drv_rtc for RTC2. */
+const  nrf_drv_rtc_t           rtc = NRF_DRV_RTC_INSTANCE(2);
 static uint32_t                rtc_ticks = RTC_US_TO_TICKS(SAADC_SAMPLE_INTERVAL_MS*1000, RTC_FREQUENCY);
-static nrf_saadc_value_t       m_buffer_pool[2][SAADC_SAMPLES_IN_BUFFER];
 static uint32_t                m_adc_evt_counter = 0;
-static bool                    m_saadc_calibrate = false;      
-static bool                    saadc_initialized = false; // Track if SAADC is initialized
-static bool                    pcap_initialized = false; // Track if PCAP04 is initialized
-static bool                    as7341_initialized = false; // Track if PCAP04 is initialized
+static bool                    saadc_initialized = false;
+static bool                    as7341_initialized = false;
 // -----------------------------------------------------------------------------
 // Function Prototypes
 // -----------------------------------------------------------------------------
@@ -352,16 +317,12 @@ int main(void)
     LEDS_OFF(LEDS_MASK);                             //Turn off all leds
 #endif
 
-    bool pcap_ok=false;
     bool as7341_ok=false;
-    NRF_POWER->DCDCEN = 1;                           //Enabling the DCDC converter for lower current consumption
-    NRF_LOG_INFO("Main Inits.");	
-    // Initialize the logging module
+    NRF_POWER->DCDCEN = 1;
     ret_code_t err_code;
 
-    err_code = NRF_SUCCESS;
     init_log();
-    NRF_LOG_INFO("init_log() returned: %d", err_code);
+    NRF_LOG_INFO("Main Inits.");
 
     gpio_init();
     NRF_LOG_INFO("gpio_init() done");
@@ -382,9 +343,8 @@ int main(void)
     NRF_LOG_INFO("test_as7341_connection() returned: %d", as7341_ok);
     if (as7341_ok)
     {
-        err_code = as7341_init_sensor();
-        NRF_LOG_INFO("as7341_init_sensor() returned: %d", err_code);
-        as7341_initialized = true;
+        as7341_initialized = as7341_init_sensor();
+        NRF_LOG_INFO("as7341_init_sensor() returned: %d", as7341_initialized);
     }
     else
     {
